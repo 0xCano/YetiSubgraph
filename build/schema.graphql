@@ -1,0 +1,100 @@
+type newTrove @entity {
+  id: ID!
+  borrower: Bytes!
+  arrayIndex: BigInt!
+  debt: BigInt!
+  amounts: [BigInt!]!
+  transaction: Bytes!
+  timestamp: BigInt!
+  }
+
+enum BorrowerOperation {
+    openTrove
+    closeTrove
+    adjustTrove
+  }
+
+type updatedTrove @entity {
+  id: ID!
+  borrower: Bytes!
+  debt: BigInt!
+  tokens: [Bytes!]!
+  amounts: [BigInt!]!
+  collsIn: [Bytes!]!
+  amountsIn: [BigInt!]!
+  collsOut: [Bytes!]!
+  amountsOut: [BigInt!]!
+  operation: String!
+  currentICR: BigInt!
+  YUSDchange: BigInt!
+  isDebtIncrease: Boolean!
+  eventAddress: Bytes!
+  transaction: Bytes!
+  timestamp: BigInt!
+  blockNum: BigInt!
+  }
+
+type YUSDPaid @entity {
+  id: ID!
+  borrower: Bytes!
+  fee: BigInt!
+  transaction: Bytes!
+  timestamp: BigInt!
+  blockNum: BigInt!
+}
+
+type VariablePaid @entity {
+  id: ID!
+  borrower: Bytes!
+  fee: BigInt!
+  transaction: Bytes!
+  timestamp: BigInt!
+  blockNum: BigInt!
+}
+
+type totalStake @entity {
+  id: ID!
+  token: Bytes!
+  newTotalStakes: BigInt!
+}
+
+type newLiquidation @entity {
+  id: ID!
+  liquidatedAmount: BigInt!
+  totalYUSDGasCompensation: BigInt!
+  totalCollTokens: [Bytes!]!
+  totalCollAmounts: [BigInt!]!
+  totalCollGasCompTokens: [Bytes!]!
+  totalCollGasCompAmounts: [BigInt!]!
+  transaction: Bytes!
+  timestamp: BigInt!
+  blockNum: BigInt!
+}
+
+type newRedemption @entity {
+  id: ID!
+  borrower: Bytes!
+  attemptedYUSDAmount: BigInt!
+  actualYUSDAmount: BigInt!
+  YUSDPaid: BigInt!
+  tokens: [Bytes!]!
+  amounts: [BigInt!]!
+  transaction: Bytes!
+  timestamp: BigInt!
+  blockNum: BigInt!
+}
+
+type farmOperation @entity {
+  id: ID!
+  user: Bytes!
+  boostedPartition: BigInt!
+  amountOfLP: BigInt!
+  rewardRate: BigInt!
+  userFactor: BigInt!
+  sumOfFactors: BigInt!
+  amount: BigInt!
+  operation: String!
+  transaction: Bytes!
+  timestamp: BigInt!
+  blockNum: BigInt!
+}
