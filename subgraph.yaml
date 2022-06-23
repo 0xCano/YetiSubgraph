@@ -10,7 +10,7 @@ dataSources:
     source:
       address: '0xBBbbbbbBBBBeC8bF32635374c0717C44B5c535eF'
       abi: BorrowerOperations
-      startBlock: 13021859
+      startBlock: 13021858
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
