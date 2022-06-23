@@ -27,6 +27,8 @@ dataSources:
           handler: handleTroveUpdated
         - event: YUSDBorrowingFeePaid(indexed address,uint256)
           handler: handleYUSDPaid
+        - event: VariableFeePaid(indexed address,uint256)
+          handler: handleVariablePaid
       file: BorrowerOperations/BorrowerOperations.wasm
   - kind: ethereum/contract
     name: TroveManager
@@ -74,6 +76,30 @@ dataSources:
         - event: Redemption(uint256,uint256,uint256,address[],uint256[])
           handler: handleRedemption
       file: TroveManagerRedemptions/TroveManagerRedemptions.wasm
+  - kind: ethereum/contract
+    name: TroveManagerLiquidations
+    network: avalanche
+    source:
+      address: "0x0000000000aDCd24b833604068cBbbb2EEb3a2a3"
+      abi: TroveManagerLiquidations
+      startBlock: 13021859
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Transfers
+      abis:
+        - name: TroveManagerLiquidations
+          file: TroveManagerLiquidations/abis/TroveManagerLiquidations.json
+        - name: TroveManager
+          file: TroveManagerLiquidations/abis/TroveManager.json
+      eventHandlers:
+        - event: TroveUpdated(indexed address,uint256,address[],uint256[],uint8)
+          handler: handleTroveUpdated
+        - event: Liquidation(uint256,uint256,address[],uint256[],address[],uint256[])
+          handler: handleLiquidation
+      file: TroveManagerLiquidations/TroveManagerLiquidations.wasm
   - kind: ethereum/contract
     name: BoostedFarm
     network: avalanche

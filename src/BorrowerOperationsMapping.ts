@@ -92,6 +92,7 @@ export function handleVariablePaid(event: VariableFeePaid): void {
   variablePaid.borrower = event.params._borrower
   variablePaid.fee = event.params._YUSDVariableFee
   variablePaid.transaction = event.transaction.hash
+  variablePaid.blockNum = event.block.number
   variablePaid.timestamp = event.block.timestamp
   variablePaid.save()
 }

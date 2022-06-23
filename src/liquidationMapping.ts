@@ -33,6 +33,8 @@ export function handleLiquidation(event: Liquidation): void {
     trove.tokens =  event.params._tokens.map<Bytes>((token) => {return addressToBytes(token)})
     trove.amounts = event.params._amounts
     trove.timestamp = event.block.timestamp
+    trove.blockNum = event.block.number
+    trove.transaction = event.transaction.hash
     trove.operation = TroveManagerOperation[event.params.operation]
     trove.save()    
   }
