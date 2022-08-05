@@ -1,6 +1,6 @@
-specVersion: 0.0.2
-description: Test Subgraph for Yeti
-repository: https://github.com/Jinho-Shin/yetisubgraphbeta
+specVersion: 0.0.4
+description: Subgraph for Yeti
+repository: https://github.com/0xCano/YetiSubgraph
 schema:
   file: ./schema.graphql
 dataSources:
@@ -22,6 +22,14 @@ dataSources:
           file: ./abis/BorrowerOperations.json
         - name: TroveManager
           file: ./abis/TroveManager.json
+        - name: VaultOracle
+          file: ./abis/VaultOracle.json
+        - name: ActivePool
+          file: ./abis/ActivePool.json
+        - name: YetiController
+          file: ./abis/YetiController.json
+        - name: YetiVaultToken
+          file: ./abis/YetiVaultToken.json
       eventHandlers:
         - event: TroveUpdated(indexed address,uint256,address[],uint256[],uint8)
           handler: handleTroveUpdated
@@ -126,3 +134,71 @@ dataSources:
         - event: EmergencyWithdraw(indexed address,uint256)
           handler: handleEmergencyWithdraw
       file: ./src/boostedFarmMapping.ts
+  - kind: ethereum/contract
+    name: YetiController
+    network: avalanche
+    source:
+      address: '0xcCCCcCccCCCc053fD8D1fF275Da4183c2954dBe3'
+      abi: YetiController
+      startBlock: 13021859
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Transfers
+      abis:
+        - name: YetiController
+          file: ./abis/YetiController.json
+      eventHandlers:
+        - event: CollateralAdded(address)
+          handler: handleCollateralAdded
+        - event: CollateralDeprecated(address)
+          handler: handleCollateralDeprecated
+        - event: CollateralUndeprecated(address)
+          handler: handleCollateralUndeprecated
+      file: ./src/yetiControllerMapping.ts
+  # - kind: ethereum/contract
+  #   name: ActivePool
+  #   network: avalanche
+  #   source:
+  #     address: '0xAAAaaAaaAaDd4AA719f0CF8889298D13dC819A15'
+  #     abi: ActivePool
+  #     startBlock: 13021859
+  #   mapping:
+  #     kind: ethereum/events
+  #     apiVersion: 0.0.6
+  #     language: wasm/assemblyscript
+  #     entities:
+  #       - Transfers
+  #     abis:
+  #       - name: ActivePool
+  #         file: ./abis/ActivePool.json
+  #       - name: YetiController
+  #         file: ./abis/YetiController.json
+  #     eventHandlers:
+  #       - event: ActivePoolBalancesUpdated(address[],uint256[])
+  #         handler: handleBalancesUpdated
+  #       - event: ActivePoolBalanceUpdated(address,uint256)
+  #         handler: handleBalanceUpdated
+  #     file: ./src/activePoolMapping.ts
+  # - kind: ethereum/contract
+  #   name: DefaultPool
+  #   network: avalanche
+  #   source:
+  #     address: '0xdDDDDDdDDD3AD7297B3D13E17414fBED370cd425'
+  #     abi: DefaultPool
+  #     startBlock: 13021859
+  #   mapping:
+  #     kind: ethereum/events
+  #     apiVersion: 0.0.6
+  #     language: wasm/assemblyscript
+  #     entities:
+  #       - Transfers
+  #     abis:
+  #       - name: DefaultPool
+  #         file: ./abis/DefaultPool.json
+  #     eventHandlers:
+  #       - event: DefaultPoolBalancesUpdated(address[],uint256[])
+  #         handler: handleBalancesUpdated
+  #     file: ./src/defaultPoolMapping.ts

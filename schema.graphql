@@ -20,10 +20,27 @@ type updatedTrove @entity {
   debt: BigInt!
   tokens: [Bytes!]!
   amounts: [BigInt!]!
+  realAmounts: [BigDecimal!]!
+  underlyingPerReceipts: [BigDecimal!]!
+  underlyingDecimals: [BigInt!]!
+  prices: [BigDecimal!]!
+  values: [BigDecimal!]!
   collsIn: [Bytes!]!
   amountsIn: [BigInt!]!
+  realAmountsIn: [BigDecimal!]!
+  valuesIn: [BigDecimal!]!
   collsOut: [Bytes!]!
   amountsOut: [BigInt!]!
+  realAmountsOut: [BigDecimal!]!
+  valuesOut: [BigDecimal!]!
+  valueChange: BigDecimal!
+  totalValue: BigDecimal!
+
+  leverages: [BigInt!]!
+  maxSlippages: [BigInt!]!
+  upperHint: Bytes!
+  lowerHint: Bytes!
+  maxFeePercentage: BigInt!
   operation: String!
   currentICR: BigInt!
   YUSDchange: BigInt!
@@ -32,6 +49,9 @@ type updatedTrove @entity {
   transaction: Bytes!
   timestamp: BigInt!
   blockNum: BigInt!
+  length: Int!
+  temp: String!
+  tempBytes: Bytes!
   }
 
 type YUSDPaid @entity {
@@ -97,4 +117,47 @@ type farmOperation @entity {
   transaction: Bytes!
   timestamp: BigInt!
   blockNum: BigInt!
+}
+
+type collateral @entity {
+  id: ID!
+  address: Bytes!
+  status: String!
+  safetyRatio: BigInt!
+  recoveryRatio: BigInt!
+  oracle: Bytes!
+  decimals: BigInt!
+  feeCurve: Bytes!
+  isWrapped: Boolean!
+  routerAddress: Bytes!
+  underlyingAddress: Bytes!
+  transaction: Bytes!
+  timestamp: BigInt!
+  blockNum: BigInt!
+}
+
+type tvl @entity {
+  id: ID!
+  collateral: Bytes!
+  amounts: [BigInt!]!
+  amount: BigInt!
+  prices: [BigInt!]!
+  values: [BigInt!]!
+  value: BigInt!
+  transactions: [Bytes!]!
+  timestamps: [BigInt!]!
+  blockNums: [BigInt!]!
+}
+
+type global @entity {
+  id: ID!
+  collaterals: [Bytes!]!
+  amounts: [BigInt!]
+  prices: [BigInt!]
+  values: [BigInt!]
+  timestamp: BigInt!
+  timestamps: [BigInt!]!
+  blockNum: BigInt!
+  loaded: Boolean!
+  temp: BigInt!
 }

@@ -1,6 +1,6 @@
-specVersion: 0.0.2
-description: Test Subgraph for Yeti
-repository: https://github.com/Jinho-Shin/yetisubgraphbeta
+specVersion: 0.0.4
+description: Subgraph for Yeti
+repository: https://github.com/0xCano/YetiSubgraph
 schema:
   file: schema.graphql
 dataSources:
@@ -10,7 +10,7 @@ dataSources:
     source:
       address: "0xBBbbbbbBBBBeC8bF32635374c0717C44B5c535eF"
       abi: BorrowerOperations
-      startBlock: 13021859
+      startBlock: 13021858
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -22,6 +22,14 @@ dataSources:
           file: BorrowerOperations/abis/BorrowerOperations.json
         - name: TroveManager
           file: BorrowerOperations/abis/TroveManager.json
+        - name: VaultOracle
+          file: BorrowerOperations/abis/VaultOracle.json
+        - name: ActivePool
+          file: BorrowerOperations/abis/ActivePool.json
+        - name: YetiController
+          file: BorrowerOperations/abis/YetiController.json
+        - name: YetiVaultToken
+          file: BorrowerOperations/abis/YetiVaultToken.json
       eventHandlers:
         - event: TroveUpdated(indexed address,uint256,address[],uint256[],uint8)
           handler: handleTroveUpdated
@@ -126,3 +134,27 @@ dataSources:
         - event: EmergencyWithdraw(indexed address,uint256)
           handler: handleEmergencyWithdraw
       file: BoostedFarm/BoostedFarm.wasm
+  - kind: ethereum/contract
+    name: YetiController
+    network: avalanche
+    source:
+      address: "0xcCCCcCccCCCc053fD8D1fF275Da4183c2954dBe3"
+      abi: YetiController
+      startBlock: 13021859
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Transfers
+      abis:
+        - name: YetiController
+          file: YetiController/abis/YetiController.json
+      eventHandlers:
+        - event: CollateralAdded(address)
+          handler: handleCollateralAdded
+        - event: CollateralDeprecated(address)
+          handler: handleCollateralDeprecated
+        - event: CollateralUndeprecated(address)
+          handler: handleCollateralUndeprecated
+      file: YetiController/YetiController.wasm
