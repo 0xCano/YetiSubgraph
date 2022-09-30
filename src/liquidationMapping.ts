@@ -1,6 +1,7 @@
 import { Liquidation, TroveUpdated } from "../generated/TroveManagerLiquidations/TroveManagerLiquidations"
-import { newLiquidation, updatedTrove } from "../generated/schema"
+import { newLiquidation, troveStatus, updatedTrove } from "../generated/schema"
 import { Address, Bytes } from "@graphprotocol/graph-ts"
+import { updateTroveStatus } from "./BorrowerOperationsMapping"
 
 function addressToBytes(address: Address): Bytes {
     return Bytes.fromHexString(address.toHexString())
@@ -36,5 +37,9 @@ export function handleLiquidation(event: Liquidation): void {
     trove.blockNum = event.block.number
     trove.transaction = event.transaction.hash
     trove.operation = TroveManagerOperation[event.params.operation]
+    let status = troveStatus.load(trove.borrower.toHex())
+    if (status) {
+      updateTroveStatus(status, trove)
+    }
     trove.save()    
   }

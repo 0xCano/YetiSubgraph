@@ -1,5 +1,5 @@
 import { TroveManager } from '../generated/TroveManager/TroveManager'
-import { newTrove, updatedTrove, tvl, YUSDPaid, global, VariablePaid, collateral} from '../generated/schema'
+import { newTrove, updatedTrove, tvl, YUSDPaid, global, VariablePaid, collateral, troveStatus} from '../generated/schema'
 import { Address, ethereum, Bytes, BigDecimal, ByteArray, bigInt, BigInt} from '@graphprotocol/graph-ts'
 import { ActivePool } from '../generated/BorrowerOperations/ActivePool'
 import { YetiController } from '../generated/BorrowerOperations/YetiController'
@@ -104,19 +104,23 @@ export function getPrice(token: Address): BigDecimal {
   return BigDecimal.zero()
 }
 
-export function getRealAmounts(amounts: BigInt[], tokens: Bytes[]): BigDecimal[] {
+export function getRealAmounts(amounts: BigInt[], tokens: Bytes[], isAmountsIn: boolean = false): BigDecimal[] {
   let addresses = tokens.map<Address>((token) => Address.fromBytes(token))
   let realAmounts: BigDecimal[] = []
   for (let i = 0; i < addresses.length; i++) {
-    realAmounts.push(getRealAmountSingle(amounts[i], addresses[i]))
+    realAmounts.push(getRealAmountSingle(amounts[i], addresses[i], isAmountsIn))
   }
   return realAmounts
 }
 
-export function getRealAmountSingle(amount: BigInt, token: Address): BigDecimal {
+export function getRealAmountSingle(amount: BigInt, token: Address, isAmountsIn: boolean = false): BigDecimal {
   let decimals = getUnderlyingDecimal(token)
   let realAmount = new BigDecimal(amount).div(new BigDecimal(BigInt.fromString("10").pow(ByteArray.fromBigInt(decimals)[0])))
-  return realAmount
+  if (isAmountsIn) {
+    return realAmount
+  }
+  let underlying = getUnderlyingPerReceipt(token)
+  return realAmount.times(underlying)
 }
 
 export function getValues(amounts: BigDecimal[], tokens: Bytes[]): BigDecimal[] {
@@ -129,21 +133,21 @@ export function getValues(amounts: BigDecimal[], tokens: Bytes[]): BigDecimal[] 
 }
 
 export function getValueSingle(amount: BigDecimal, token: Address): BigDecimal {
-  let decimals = getUnderlyingDecimal(token)
-  
-  let underlying = getUnderlyingPerReceipt(token)
+
   let price = getPrice(token)
   if (["0xad69de0ce8ab50b729d3f798d7bc9ac7b4e79267", 
         "0xf311ff3277d42c354fe9d76d1e286736861844b5", 
         "0x0ad0bc8aa6c76b558ee471b7ad70ee7b65704e5d", 
         "0x6946b0527421b72df7a5f0c0c7a1474219684e8f", 
         "0xba9fb5adbaf7ad4ea7b6913a91c7e3196933fc09"]
-        .includes(token.toString().toLowerCase())) {
+        .includes(token.toHexString().toLowerCase())) {
+          let decimals = getUnderlyingDecimal(token)
+          let underlying = getUnderlyingPerReceipt(token)
           let power = 18 - ByteArray.fromBigInt(decimals)[0]
           let exp = new BigDecimal(BigInt.fromString("10").pow(ByteArray.fromI32(power)[0]))
-          price = price.times(exp).div(underlying)
+          price = price.div(exp).div(underlying)
   }
-  return amount.times(underlying).times(price)
+  return amount.times(price)
 }
 
 export function sumValues(values: BigDecimal[]): BigDecimal {
@@ -154,15 +158,21 @@ export function sumValues(values: BigDecimal[]): BigDecimal {
   return sum
 }
 
+export function updateTroveStatus(status: troveStatus, trove: updatedTrove): void {
+    status.borrower = trove.borrower
+    status.created = trove.blockNum
+    status.tokens = trove.tokens
+    status.amounts = trove.amounts
+    status.realAmounts = trove.realAmounts
+    status.save()
+}
+
 
 export function handleTroveUpdated(event: TroveUpdated): void {
   let id = event.transaction.hash.toHex()
   let trove = updatedTrove.load(id)
   if (trove == null) {
     trove = new updatedTrove(id)
-  } else {
-    let contract = TroveManager.bind(Address.fromBytes(trove.eventAddress))
-    trove.currentICR = contract.getCurrentICR(Address.fromBytes(event.params._borrower))
   }
     trove.borrower = event.params._borrower
     trove.debt = event.params._debt
@@ -180,6 +190,8 @@ export function handleTroveUpdated(event: TroveUpdated): void {
     let operation = trove.operation
 
     if (operation == 'openTrove') {
+        let newStatus = new troveStatus(trove.borrower.toHex())
+        updateTroveStatus(newStatus, trove)
         let decoded = ethereum.decode(
           '(uint256,uint256,address,address,address[],uint256[])',
           dataToDecode
@@ -220,6 +232,27 @@ export function handleTroveUpdated(event: TroveUpdated): void {
           dataToDecode
         );
         if (decoded != null) {
+          let status = troveStatus.load(trove.borrower.toHex())
+          if (status) {
+            let gapIn :BigInt[] = []
+            let gapOut :BigInt[] = []
+            for (let i = 0; i < trove.tokens.length; i++) {
+              let token = trove.tokens[i]
+              if (status.tokens.includes(token)) {
+                let prevAmount = status.amounts[status.tokens.indexOf(token)]
+                let newAmount = trove.amounts[i]
+                if (prevAmount.lt(newAmount)) {
+                  gapIn.push(newAmount.minus(prevAmount))
+                }
+                else if (newAmount.lt(prevAmount)) {
+                  gapOut.push(prevAmount.minus(newAmount))
+                }
+              }
+            }
+            trove.gapIn = gapIn
+            trove.gapOut = gapOut
+            updateTroveStatus(status, trove)
+          }
           let t = decoded.toTuple();
           trove.collsIn = t[0].toAddressArray().map<Bytes>((token) => token)
           trove.amountsIn = t[1].toBigIntArray()
@@ -283,14 +316,17 @@ export function handleTroveUpdated(event: TroveUpdated): void {
     }
 
     // updateTVL(trove.collsIn, trove.amountsIn, trove.collsOut, trove.amountsOut, event)
-    trove.realAmountsIn = getRealAmounts(trove.amountsIn, trove.collsIn)
+    if (trove.debt.gt(BigInt.zero())) {
+      let contract = TroveManager.bind(Address.fromString("0x000000000000614c27530d24B5f039EC15A61d8d".toLowerCase()))
+      trove.currentICR = contract.getCurrentICR(Address.fromBytes(event.params._borrower))
+    }
+    trove.realAmountsIn = getRealAmounts(trove.amountsIn, trove.collsIn, true)
     trove.valuesIn = getValues(trove.realAmountsIn, trove.collsIn)
     trove.realAmountsOut = getRealAmounts(trove.amountsOut, trove.collsOut)
     trove.valuesOut = getValues(trove.realAmountsOut, trove.collsOut)
     trove.totalValue = sumValues(trove.values)
     trove.valueChange = sumValues(trove.valuesIn).minus(sumValues(trove.valuesOut))
     trove.save()
-    updateTVL(event)
 }
 
 
@@ -333,8 +369,12 @@ export function handleVariablePaid(event: VariableFeePaid): void {
   variablePaid.save()
 }
 
+export function updateCollateralValue (user: Address): void {
+  
+}
 
-export function updateTVL (event: TroveUpdated): void {
+
+export function globalUpdate (event: TroveUpdated): void {
   let globalInfo = global.load("only")
   let newGlobal = false
   if (globalInfo == null) {

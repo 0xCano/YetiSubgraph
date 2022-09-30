@@ -105,6 +105,127 @@ export class newTrove extends Entity {
   }
 }
 
+export class troveStatus extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("borrower", Value.fromBytes(Bytes.empty()));
+    this.set("created", Value.fromBigInt(BigInt.zero()));
+    this.set("tokens", Value.fromBytesArray(new Array(0)));
+    this.set("amounts", Value.fromBigIntArray(new Array(0)));
+    this.set("realAmounts", Value.fromBigDecimalArray(new Array(0)));
+    this.set("values", Value.fromBigDecimalArray(new Array(0)));
+    this.set("totalValues", Value.fromBigDecimalArray(new Array(0)));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save troveStatus entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save troveStatus entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("troveStatus", id.toString(), this);
+    }
+  }
+
+  static load(id: string): troveStatus | null {
+    return changetype<troveStatus | null>(store.get("troveStatus", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get borrower(): Bytes {
+    let value = this.get("borrower");
+    return value!.toBytes();
+  }
+
+  set borrower(value: Bytes) {
+    this.set("borrower", Value.fromBytes(value));
+  }
+
+  get created(): BigInt {
+    let value = this.get("created");
+    return value!.toBigInt();
+  }
+
+  set created(value: BigInt) {
+    this.set("created", Value.fromBigInt(value));
+  }
+
+  get tokens(): Array<Bytes> {
+    let value = this.get("tokens");
+    return value!.toBytesArray();
+  }
+
+  set tokens(value: Array<Bytes>) {
+    this.set("tokens", Value.fromBytesArray(value));
+  }
+
+  get amounts(): Array<BigInt> {
+    let value = this.get("amounts");
+    return value!.toBigIntArray();
+  }
+
+  set amounts(value: Array<BigInt>) {
+    this.set("amounts", Value.fromBigIntArray(value));
+  }
+
+  get realAmounts(): Array<BigDecimal> {
+    let value = this.get("realAmounts");
+    return value!.toBigDecimalArray();
+  }
+
+  set realAmounts(value: Array<BigDecimal>) {
+    this.set("realAmounts", Value.fromBigDecimalArray(value));
+  }
+
+  get values(): Array<BigDecimal> {
+    let value = this.get("values");
+    return value!.toBigDecimalArray();
+  }
+
+  set values(value: Array<BigDecimal>) {
+    this.set("values", Value.fromBigDecimalArray(value));
+  }
+
+  get totalValues(): Array<BigDecimal> {
+    let value = this.get("totalValues");
+    return value!.toBigDecimalArray();
+  }
+
+  set totalValues(value: Array<BigDecimal>) {
+    this.set("totalValues", Value.fromBigDecimalArray(value));
+  }
+
+  get timestamps(): Array<BigInt> | null {
+    let value = this.get("timestamps");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigIntArray();
+    }
+  }
+
+  set timestamps(value: Array<BigInt> | null) {
+    if (!value) {
+      this.unset("timestamps");
+    } else {
+      this.set("timestamps", Value.fromBigIntArray(<Array<BigInt>>value));
+    }
+  }
+}
+
 export class updatedTrove extends Entity {
   constructor(id: string) {
     super();
@@ -121,10 +242,12 @@ export class updatedTrove extends Entity {
     this.set("values", Value.fromBigDecimalArray(new Array(0)));
     this.set("collsIn", Value.fromBytesArray(new Array(0)));
     this.set("amountsIn", Value.fromBigIntArray(new Array(0)));
+    this.set("gapIn", Value.fromBigIntArray(new Array(0)));
     this.set("realAmountsIn", Value.fromBigDecimalArray(new Array(0)));
     this.set("valuesIn", Value.fromBigDecimalArray(new Array(0)));
     this.set("collsOut", Value.fromBytesArray(new Array(0)));
     this.set("amountsOut", Value.fromBigIntArray(new Array(0)));
+    this.set("gapOut", Value.fromBigIntArray(new Array(0)));
     this.set("realAmountsOut", Value.fromBigDecimalArray(new Array(0)));
     this.set("valuesOut", Value.fromBigDecimalArray(new Array(0)));
     this.set("valueChange", Value.fromBigDecimal(BigDecimal.zero()));
@@ -272,6 +395,15 @@ export class updatedTrove extends Entity {
     this.set("amountsIn", Value.fromBigIntArray(value));
   }
 
+  get gapIn(): Array<BigInt> {
+    let value = this.get("gapIn");
+    return value!.toBigIntArray();
+  }
+
+  set gapIn(value: Array<BigInt>) {
+    this.set("gapIn", Value.fromBigIntArray(value));
+  }
+
   get realAmountsIn(): Array<BigDecimal> {
     let value = this.get("realAmountsIn");
     return value!.toBigDecimalArray();
@@ -306,6 +438,15 @@ export class updatedTrove extends Entity {
 
   set amountsOut(value: Array<BigInt>) {
     this.set("amountsOut", Value.fromBigIntArray(value));
+  }
+
+  get gapOut(): Array<BigInt> {
+    let value = this.get("gapOut");
+    return value!.toBigIntArray();
+  }
+
+  set gapOut(value: Array<BigInt>) {
+    this.set("gapOut", Value.fromBigIntArray(value));
   }
 
   get realAmountsOut(): Array<BigDecimal> {
@@ -1533,5 +1674,81 @@ export class global extends Entity {
 
   set temp(value: BigInt) {
     this.set("temp", Value.fromBigInt(value));
+  }
+}
+
+export class sanctionedAddress extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("address", Value.fromBytes(Bytes.empty()));
+    this.set("transaction", Value.fromBytes(Bytes.empty()));
+    this.set("timestamp", Value.fromBigInt(BigInt.zero()));
+    this.set("blockNum", Value.fromBigInt(BigInt.zero()));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save sanctionedAddress entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save sanctionedAddress entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("sanctionedAddress", id.toString(), this);
+    }
+  }
+
+  static load(id: string): sanctionedAddress | null {
+    return changetype<sanctionedAddress | null>(
+      store.get("sanctionedAddress", id)
+    );
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get address(): Bytes {
+    let value = this.get("address");
+    return value!.toBytes();
+  }
+
+  set address(value: Bytes) {
+    this.set("address", Value.fromBytes(value));
+  }
+
+  get transaction(): Bytes {
+    let value = this.get("transaction");
+    return value!.toBytes();
+  }
+
+  set transaction(value: Bytes) {
+    this.set("transaction", Value.fromBytes(value));
+  }
+
+  get timestamp(): BigInt {
+    let value = this.get("timestamp");
+    return value!.toBigInt();
+  }
+
+  set timestamp(value: BigInt) {
+    this.set("timestamp", Value.fromBigInt(value));
+  }
+
+  get blockNum(): BigInt {
+    let value = this.get("blockNum");
+    return value!.toBigInt();
+  }
+
+  set blockNum(value: BigInt) {
+    this.set("blockNum", Value.fromBigInt(value));
   }
 }

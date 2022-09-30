@@ -14,6 +14,18 @@ enum BorrowerOperation {
     adjustTrove
   }
 
+type troveStatus @entity {
+  id: ID!
+  borrower: Bytes!
+  created: BigInt!
+  tokens: [Bytes!]!
+  amounts: [BigInt!]!
+  realAmounts: [BigDecimal!]!
+  values: [BigDecimal!]!
+  totalValues: [BigDecimal!]!
+  timestamps: [BigInt!]
+}
+
 type updatedTrove @entity {
   id: ID!
   borrower: Bytes!
@@ -27,10 +39,12 @@ type updatedTrove @entity {
   values: [BigDecimal!]!
   collsIn: [Bytes!]!
   amountsIn: [BigInt!]!
+  gapIn: [BigInt!]!
   realAmountsIn: [BigDecimal!]!
   valuesIn: [BigDecimal!]!
   collsOut: [Bytes!]!
   amountsOut: [BigInt!]!
+  gapOut: [BigInt!]!
   realAmountsOut: [BigDecimal!]!
   valuesOut: [BigDecimal!]!
   valueChange: BigDecimal!
@@ -160,4 +174,12 @@ type global @entity {
   blockNum: BigInt!
   loaded: Boolean!
   temp: BigInt!
+}
+
+type sanctionedAddress @entity {
+  id: ID!
+  address: Bytes!
+  transaction: Bytes!
+  timestamp: BigInt!
+  blockNum: BigInt!
 }
