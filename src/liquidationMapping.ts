@@ -1,13 +1,14 @@
 import { Liquidation, TroveUpdated } from "../generated/TroveManagerLiquidations/TroveManagerLiquidations"
 import { newLiquidation, troveStatus, updatedTrove } from "../generated/schema"
 import { Address, Bytes } from "@graphprotocol/graph-ts"
-import { updateTroveStatus } from "./BorrowerOperationsMapping"
+import { updateTroveStatus } from "./utils"
 
 function addressToBytes(address: Address): Bytes {
     return Bytes.fromHexString(address.toHexString())
   }
 
-  var TroveManagerOperation = ["applyPendingRewards", "liquidateInNormalMode", 
+var TroveManagerOperation = [
+  "applyPendingRewards", "liquidateInNormalMode", 
   "liquidateInRecoveryMode", "redeemCollateral"]
 
 export function handleLiquidation(event: Liquidation): void {

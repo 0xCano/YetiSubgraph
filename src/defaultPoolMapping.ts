@@ -25,4 +25,4 @@ export function handleBalancesUpdated(event: DefaultPoolBalancesUpdated): void {
         tvlUpdate.blockNums = newBlockNums
         tvlUpdate.save()
     }
-  }
+}

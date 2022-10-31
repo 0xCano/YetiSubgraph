@@ -11,100 +11,6 @@ import {
   BigDecimal
 } from "@graphprotocol/graph-ts";
 
-export class newTrove extends Entity {
-  constructor(id: string) {
-    super();
-    this.set("id", Value.fromString(id));
-
-    this.set("borrower", Value.fromBytes(Bytes.empty()));
-    this.set("arrayIndex", Value.fromBigInt(BigInt.zero()));
-    this.set("debt", Value.fromBigInt(BigInt.zero()));
-    this.set("amounts", Value.fromBigIntArray(new Array(0)));
-    this.set("transaction", Value.fromBytes(Bytes.empty()));
-    this.set("timestamp", Value.fromBigInt(BigInt.zero()));
-  }
-
-  save(): void {
-    let id = this.get("id");
-    assert(id != null, "Cannot save newTrove entity without an ID");
-    if (id) {
-      assert(
-        id.kind == ValueKind.STRING,
-        "Cannot save newTrove entity with non-string ID. " +
-          'Considering using .toHex() to convert the "id" to a string.'
-      );
-      store.set("newTrove", id.toString(), this);
-    }
-  }
-
-  static load(id: string): newTrove | null {
-    return changetype<newTrove | null>(store.get("newTrove", id));
-  }
-
-  get id(): string {
-    let value = this.get("id");
-    return value!.toString();
-  }
-
-  set id(value: string) {
-    this.set("id", Value.fromString(value));
-  }
-
-  get borrower(): Bytes {
-    let value = this.get("borrower");
-    return value!.toBytes();
-  }
-
-  set borrower(value: Bytes) {
-    this.set("borrower", Value.fromBytes(value));
-  }
-
-  get arrayIndex(): BigInt {
-    let value = this.get("arrayIndex");
-    return value!.toBigInt();
-  }
-
-  set arrayIndex(value: BigInt) {
-    this.set("arrayIndex", Value.fromBigInt(value));
-  }
-
-  get debt(): BigInt {
-    let value = this.get("debt");
-    return value!.toBigInt();
-  }
-
-  set debt(value: BigInt) {
-    this.set("debt", Value.fromBigInt(value));
-  }
-
-  get amounts(): Array<BigInt> {
-    let value = this.get("amounts");
-    return value!.toBigIntArray();
-  }
-
-  set amounts(value: Array<BigInt>) {
-    this.set("amounts", Value.fromBigIntArray(value));
-  }
-
-  get transaction(): Bytes {
-    let value = this.get("transaction");
-    return value!.toBytes();
-  }
-
-  set transaction(value: Bytes) {
-    this.set("transaction", Value.fromBytes(value));
-  }
-
-  get timestamp(): BigInt {
-    let value = this.get("timestamp");
-    return value!.toBigInt();
-  }
-
-  set timestamp(value: BigInt) {
-    this.set("timestamp", Value.fromBigInt(value));
-  }
-}
-
 export class troveStatus extends Entity {
   constructor(id: string) {
     super();
@@ -232,42 +138,32 @@ export class updatedTrove extends Entity {
     this.set("id", Value.fromString(id));
 
     this.set("borrower", Value.fromBytes(Bytes.empty()));
+    this.set("operation", Value.fromString(""));
     this.set("debt", Value.fromBigInt(BigInt.zero()));
+    this.set("isDebtIncrease", Value.fromBoolean(false));
+    this.set("YUSDchange", Value.fromBigInt(BigInt.zero()));
     this.set("tokens", Value.fromBytesArray(new Array(0)));
     this.set("amounts", Value.fromBigIntArray(new Array(0)));
     this.set("realAmounts", Value.fromBigDecimalArray(new Array(0)));
-    this.set("underlyingPerReceipts", Value.fromBigDecimalArray(new Array(0)));
-    this.set("underlyingDecimals", Value.fromBigIntArray(new Array(0)));
-    this.set("prices", Value.fromBigDecimalArray(new Array(0)));
     this.set("values", Value.fromBigDecimalArray(new Array(0)));
     this.set("collsIn", Value.fromBytesArray(new Array(0)));
     this.set("amountsIn", Value.fromBigIntArray(new Array(0)));
-    this.set("gapIn", Value.fromBigIntArray(new Array(0)));
     this.set("realAmountsIn", Value.fromBigDecimalArray(new Array(0)));
     this.set("valuesIn", Value.fromBigDecimalArray(new Array(0)));
     this.set("collsOut", Value.fromBytesArray(new Array(0)));
     this.set("amountsOut", Value.fromBigIntArray(new Array(0)));
-    this.set("gapOut", Value.fromBigIntArray(new Array(0)));
     this.set("realAmountsOut", Value.fromBigDecimalArray(new Array(0)));
     this.set("valuesOut", Value.fromBigDecimalArray(new Array(0)));
     this.set("valueChange", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("totalValue", Value.fromBigDecimal(BigDecimal.zero()));
-    this.set("leverages", Value.fromBigIntArray(new Array(0)));
+    this.set("currentICR", Value.fromBigInt(BigInt.zero()));
     this.set("maxSlippages", Value.fromBigIntArray(new Array(0)));
     this.set("upperHint", Value.fromBytes(Bytes.empty()));
     this.set("lowerHint", Value.fromBytes(Bytes.empty()));
     this.set("maxFeePercentage", Value.fromBigInt(BigInt.zero()));
-    this.set("operation", Value.fromString(""));
-    this.set("currentICR", Value.fromBigInt(BigInt.zero()));
-    this.set("YUSDchange", Value.fromBigInt(BigInt.zero()));
-    this.set("isDebtIncrease", Value.fromBoolean(false));
-    this.set("eventAddress", Value.fromBytes(Bytes.empty()));
     this.set("transaction", Value.fromBytes(Bytes.empty()));
     this.set("timestamp", Value.fromBigInt(BigInt.zero()));
     this.set("blockNum", Value.fromBigInt(BigInt.zero()));
-    this.set("length", Value.fromI32(0));
-    this.set("temp", Value.fromString(""));
-    this.set("tempBytes", Value.fromBytes(Bytes.empty()));
   }
 
   save(): void {
@@ -305,6 +201,15 @@ export class updatedTrove extends Entity {
     this.set("borrower", Value.fromBytes(value));
   }
 
+  get operation(): string {
+    let value = this.get("operation");
+    return value!.toString();
+  }
+
+  set operation(value: string) {
+    this.set("operation", Value.fromString(value));
+  }
+
   get debt(): BigInt {
     let value = this.get("debt");
     return value!.toBigInt();
@@ -312,6 +217,24 @@ export class updatedTrove extends Entity {
 
   set debt(value: BigInt) {
     this.set("debt", Value.fromBigInt(value));
+  }
+
+  get isDebtIncrease(): boolean {
+    let value = this.get("isDebtIncrease");
+    return value!.toBoolean();
+  }
+
+  set isDebtIncrease(value: boolean) {
+    this.set("isDebtIncrease", Value.fromBoolean(value));
+  }
+
+  get YUSDchange(): BigInt {
+    let value = this.get("YUSDchange");
+    return value!.toBigInt();
+  }
+
+  set YUSDchange(value: BigInt) {
+    this.set("YUSDchange", Value.fromBigInt(value));
   }
 
   get tokens(): Array<Bytes> {
@@ -341,33 +264,6 @@ export class updatedTrove extends Entity {
     this.set("realAmounts", Value.fromBigDecimalArray(value));
   }
 
-  get underlyingPerReceipts(): Array<BigDecimal> {
-    let value = this.get("underlyingPerReceipts");
-    return value!.toBigDecimalArray();
-  }
-
-  set underlyingPerReceipts(value: Array<BigDecimal>) {
-    this.set("underlyingPerReceipts", Value.fromBigDecimalArray(value));
-  }
-
-  get underlyingDecimals(): Array<BigInt> {
-    let value = this.get("underlyingDecimals");
-    return value!.toBigIntArray();
-  }
-
-  set underlyingDecimals(value: Array<BigInt>) {
-    this.set("underlyingDecimals", Value.fromBigIntArray(value));
-  }
-
-  get prices(): Array<BigDecimal> {
-    let value = this.get("prices");
-    return value!.toBigDecimalArray();
-  }
-
-  set prices(value: Array<BigDecimal>) {
-    this.set("prices", Value.fromBigDecimalArray(value));
-  }
-
   get values(): Array<BigDecimal> {
     let value = this.get("values");
     return value!.toBigDecimalArray();
@@ -393,15 +289,6 @@ export class updatedTrove extends Entity {
 
   set amountsIn(value: Array<BigInt>) {
     this.set("amountsIn", Value.fromBigIntArray(value));
-  }
-
-  get gapIn(): Array<BigInt> {
-    let value = this.get("gapIn");
-    return value!.toBigIntArray();
-  }
-
-  set gapIn(value: Array<BigInt>) {
-    this.set("gapIn", Value.fromBigIntArray(value));
   }
 
   get realAmountsIn(): Array<BigDecimal> {
@@ -440,15 +327,6 @@ export class updatedTrove extends Entity {
     this.set("amountsOut", Value.fromBigIntArray(value));
   }
 
-  get gapOut(): Array<BigInt> {
-    let value = this.get("gapOut");
-    return value!.toBigIntArray();
-  }
-
-  set gapOut(value: Array<BigInt>) {
-    this.set("gapOut", Value.fromBigIntArray(value));
-  }
-
   get realAmountsOut(): Array<BigDecimal> {
     let value = this.get("realAmountsOut");
     return value!.toBigDecimalArray();
@@ -485,13 +363,13 @@ export class updatedTrove extends Entity {
     this.set("totalValue", Value.fromBigDecimal(value));
   }
 
-  get leverages(): Array<BigInt> {
-    let value = this.get("leverages");
-    return value!.toBigIntArray();
+  get currentICR(): BigInt {
+    let value = this.get("currentICR");
+    return value!.toBigInt();
   }
 
-  set leverages(value: Array<BigInt>) {
-    this.set("leverages", Value.fromBigIntArray(value));
+  set currentICR(value: BigInt) {
+    this.set("currentICR", Value.fromBigInt(value));
   }
 
   get maxSlippages(): Array<BigInt> {
@@ -530,51 +408,6 @@ export class updatedTrove extends Entity {
     this.set("maxFeePercentage", Value.fromBigInt(value));
   }
 
-  get operation(): string {
-    let value = this.get("operation");
-    return value!.toString();
-  }
-
-  set operation(value: string) {
-    this.set("operation", Value.fromString(value));
-  }
-
-  get currentICR(): BigInt {
-    let value = this.get("currentICR");
-    return value!.toBigInt();
-  }
-
-  set currentICR(value: BigInt) {
-    this.set("currentICR", Value.fromBigInt(value));
-  }
-
-  get YUSDchange(): BigInt {
-    let value = this.get("YUSDchange");
-    return value!.toBigInt();
-  }
-
-  set YUSDchange(value: BigInt) {
-    this.set("YUSDchange", Value.fromBigInt(value));
-  }
-
-  get isDebtIncrease(): boolean {
-    let value = this.get("isDebtIncrease");
-    return value!.toBoolean();
-  }
-
-  set isDebtIncrease(value: boolean) {
-    this.set("isDebtIncrease", Value.fromBoolean(value));
-  }
-
-  get eventAddress(): Bytes {
-    let value = this.get("eventAddress");
-    return value!.toBytes();
-  }
-
-  set eventAddress(value: Bytes) {
-    this.set("eventAddress", Value.fromBytes(value));
-  }
-
   get transaction(): Bytes {
     let value = this.get("transaction");
     return value!.toBytes();
@@ -600,33 +433,6 @@ export class updatedTrove extends Entity {
 
   set blockNum(value: BigInt) {
     this.set("blockNum", Value.fromBigInt(value));
-  }
-
-  get length(): i32 {
-    let value = this.get("length");
-    return value!.toI32();
-  }
-
-  set length(value: i32) {
-    this.set("length", Value.fromI32(value));
-  }
-
-  get temp(): string {
-    let value = this.get("temp");
-    return value!.toString();
-  }
-
-  set temp(value: string) {
-    this.set("temp", Value.fromString(value));
-  }
-
-  get tempBytes(): Bytes {
-    let value = this.get("tempBytes");
-    return value!.toBytes();
-  }
-
-  set tempBytes(value: Bytes) {
-    this.set("tempBytes", Value.fromBytes(value));
   }
 }
 
