@@ -112,6 +112,14 @@ dataSources:
           file: TroveManagerLiquidations/abis/TroveManagerLiquidations.json
         - name: TroveManager
           file: TroveManagerLiquidations/abis/TroveManager.json
+        - name: VaultOracle
+          file: TroveManagerLiquidations/abis/VaultOracle.json
+        - name: ActivePool
+          file: TroveManagerLiquidations/abis/ActivePool.json
+        - name: YetiController
+          file: TroveManagerLiquidations/abis/YetiController.json
+        - name: YetiVaultToken
+          file: TroveManagerLiquidations/abis/YetiVaultToken.json
       eventHandlers:
         - event: TroveUpdated(indexed address,uint256,address[],uint256[],uint8)
           handler: handleTroveUpdated
