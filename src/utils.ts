@@ -1,10 +1,7 @@
 import { Address, BigDecimal, BigInt, ByteArray, Bytes, ethereum } from "@graphprotocol/graph-ts";
-import { ActivePool } from "../generated/BorrowerOperations/ActivePool";
 import { YetiController } from "../generated/BorrowerOperations/YetiController";
 import { YetiVaultToken } from "../generated/BorrowerOperations/YetiVaultToken";
-import { tvl, global, troveStatus, updatedTrove } from "../generated/schema";
-import { TroveUpdated } from "../generated/TroveManager/TroveManager";
-
+import { troveStatus, updatedTrove } from "../generated/schema";
 
 export function getTxnInputDataToDecode(event: ethereum.Event): Bytes {
     const inputDataHexString = event.transaction.input.toHexString().slice(10); //take away function signature: '0x????????'
@@ -104,74 +101,3 @@ export function getTxnInputDataToDecode(event: ethereum.Event): Bytes {
     status.realAmounts = trove.realAmounts
     status.save()
 }
-
-
-  export function globalUpdate (event: TroveUpdated): void {
-    let globalInfo = global.load("only")
-    let newGlobal = false
-    if (globalInfo == null) {
-      globalInfo = new global("only")
-      newGlobal = true
-      globalInfo.loaded = false
-    } else {
-      globalInfo.loaded = true
-    }
-    const oneHour = BigInt.fromString("3500")
-    let newTimestamp = event.block.timestamp
-    let gap = newTimestamp.minus(globalInfo.timestamp)
-    if (newGlobal || gap.gt(oneHour)) {
-      let pool = ActivePool.bind(Address.fromString("0xAAAaaAaaAaDd4AA719f0CF8889298D13dC819A15".toLowerCase()))
-      let call = pool.try_getAllCollateral()
-      if (!call.reverted) {
-        let data = call.value
-        let colls = data.value0
-        let amounts = data.value1
-        globalInfo.collaterals = colls.map<Bytes>((token) => token)
-        globalInfo.amounts = amounts
-        globalInfo.timestamp = event.block.timestamp
-        let timestamps = globalInfo.timestamps
-        timestamps.push(event.block.timestamp)
-        globalInfo.timestamps = timestamps
-        globalInfo.blockNum = event.block.number
-        for (let i = 0; i < colls.length; i++) {
-          let coll = colls[i]
-          let tvlUpdate = tvl.load(coll.toHex())
-          if (tvlUpdate == null) {
-              tvlUpdate = new tvl(coll.toHex())
-              tvlUpdate.collateral = coll
-          }
-          let controller = YetiController.bind(Address.fromString("0xcCCCcCccCCCc053fD8D1fF275Da4183c2954dBe3".toLowerCase()))
-          let call = controller.try_getPrice(coll)
-          let price = BigInt.zero()
-          if (!call.reverted) {
-              price = call.value
-          }
-          let newPrices = tvlUpdate.prices
-          newPrices.push(price)
-          tvlUpdate.prices = newPrices
-          tvlUpdate.amount = amounts[i]
-          let newAmounts = tvlUpdate.amounts
-          newAmounts.push(amounts[i])
-          tvlUpdate.amounts = newAmounts
-          let newValue = price.times(amounts[i])
-          tvlUpdate.value = newValue
-          let newValues = tvlUpdate.values
-          newValues.push(newValue)
-          tvlUpdate.values = newValues
-          let newTransactions = tvlUpdate.transactions
-          newTransactions.push(event.transaction.hash)
-          tvlUpdate.transactions = newTransactions
-          let newTimestamps = tvlUpdate.timestamps
-          newTimestamps.push(event.block.timestamp)
-          tvlUpdate.timestamps = newTimestamps
-          let newBlockNums = tvlUpdate.blockNums
-          newBlockNums.push(event.block.number)
-          tvlUpdate.blockNums = newBlockNums
-          tvlUpdate.save()
-        }
-        globalInfo.save()
-      }
-    }
-  }
-  
-  

@@ -40,6 +40,11 @@ export function handleTroveUpdated(event: TroveUpdated): void {
   troveUpdate.realAmounts = getRealAmounts(troveUpdate.amounts, troveUpdate.tokens)
   troveUpdate.values = getValues(troveUpdate.realAmounts, troveUpdate.tokens)
   troveUpdate.totalValue = sumValues(troveUpdate.values)
+  /**
+   * Take the most recent trove Status and calculate the difference.
+   * This is necessary because the TroveUpdate event does not
+   * emit information about collsOut and amountsOut.
+   */
   let status = troveStatus.load(troveUpdate.borrower.toHex())
   let collsOut :Bytes[] = []
   let amountsOut :BigInt[] = []
