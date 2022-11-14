@@ -18,6 +18,25 @@
       {
         "indexed": false,
         "internalType": "address",
+        "name": "_borrower",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "totalInterest",
+        "type": "uint256"
+      }
+    ],
+    "name": "InterestApplied",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
         "name": "_Coll_Address",
         "type": "address"
       },
@@ -54,6 +73,25 @@
       }
     ],
     "name": "LTermsUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "new_Lterm",
+        "type": "uint256"
+      }
+    ],
+    "name": "L_YUSDInterestUpdated",
     "type": "event"
   },
   {
@@ -321,58 +359,7 @@
   },
   {
     "inputs": [],
-    "name": "BOOTSTRAP_PERIOD",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "DECIMAL_PRECISION",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "L_Coll",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "L_YUSDDebt",
     "outputs": [
       {
         "internalType": "uint256",
@@ -414,28 +401,9 @@
     "name": "NAME",
     "outputs": [
       {
-        "internalType": "bytes32",
+        "internalType": "string",
         "name": "",
-        "type": "bytes32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "TroveOwners",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
+        "type": "string"
       }
     ],
     "stateMutability": "view",
@@ -518,6 +486,48 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_newInterestTimeWindow",
+        "type": "uint256"
+      }
+    ],
+    "name": "changeInterestTimeWindow",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_borrower",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_debtChange",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "_isDebtIncrease",
+        "type": "bool"
+      }
+    ],
+    "name": "changeTroveDebt",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "newDebt",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "checkRecoveryMode",
     "outputs": [
@@ -528,32 +538,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_borrower",
-        "type": "address"
-      }
-    ],
-    "name": "closeTroveLiquidation",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_borrower",
-        "type": "address"
-      }
-    ],
-    "name": "closeTroveRedemption",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -573,43 +557,6 @@
       }
     ],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_borrower",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_debtDecrease",
-        "type": "uint256"
-      }
-    ],
-    "name": "decreaseTroveDebt",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getBORROWING_FEE_FLOOR",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -679,6 +626,49 @@
   {
     "inputs": [],
     "name": "getCCR",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_borrower",
+        "type": "address"
+      }
+    ],
+    "name": "getCollateralProportionDenominator",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_borrower",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_collateral",
+        "type": "address"
+      }
+    ],
+    "name": "getCollateralProportionNumerator",
     "outputs": [
       {
         "internalType": "uint256",
@@ -795,6 +785,11 @@
         "internalType": "uint256[]",
         "name": "",
         "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -927,6 +922,11 @@
       {
         "internalType": "uint256",
         "name": "pendingYUSDDebtReward",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "pendingYUSDInterest",
         "type": "uint256"
       }
     ],
@@ -1244,16 +1244,18 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_borrower",
+        "name": "_newCollateral",
         "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_debtIncrease",
-        "type": "uint256"
       }
     ],
-    "name": "increaseTroveDebt",
+    "name": "interestInitCollateral",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "interestTimeWindow",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1261,7 +1263,7 @@
         "type": "uint256"
       }
     ],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1305,6 +1307,19 @@
   {
     "inputs": [],
     "name": "lastFeeOperationTime",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "lastInterestRateUpdateTime",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1472,65 +1487,14 @@
         "internalType": "address",
         "name": "_borrower",
         "type": "address"
-      }
-    ],
-    "name": "removeStake",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
+      },
       {
-        "internalType": "address",
-        "name": "_borrower",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "_status",
+        "type": "uint256"
       }
     ],
     "name": "removeStakeAndCloseTrove",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_borrowerOperationsAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_activePoolAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_defaultPoolAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_sortedTrovesAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_controllerAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_troveManagerRedemptionsAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_troveManagerLiquidationsAddress",
-        "type": "address"
-      }
-    ],
-    "name": "setAddresses",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1554,22 +1518,10 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "totalCollateralSnapshot",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
+    "inputs": [],
+    "name": "tickInterest",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -1580,7 +1532,7 @@
         "type": "address"
       }
     ],
-    "name": "totalStakes",
+    "name": "totalCollateralSnapshot",
     "outputs": [
       {
         "internalType": "uint256",

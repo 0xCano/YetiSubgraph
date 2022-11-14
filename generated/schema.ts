@@ -157,6 +157,7 @@ export class updatedTrove extends Entity {
     this.set("valueChange", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("totalValue", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("currentICR", Value.fromBigInt(BigInt.zero()));
+    this.set("interest", Value.fromBigInt(BigInt.zero()));
     this.set("maxSlippages", Value.fromBigIntArray(new Array(0)));
     this.set("upperHint", Value.fromBytes(Bytes.empty()));
     this.set("lowerHint", Value.fromBytes(Bytes.empty()));
@@ -370,6 +371,15 @@ export class updatedTrove extends Entity {
 
   set currentICR(value: BigInt) {
     this.set("currentICR", Value.fromBigInt(value));
+  }
+
+  get interest(): BigInt {
+    let value = this.get("interest");
+    return value!.toBigInt();
+  }
+
+  set interest(value: BigInt) {
+    this.set("interest", Value.fromBigInt(value));
   }
 
   get maxSlippages(): Array<BigInt> {
@@ -1529,6 +1539,90 @@ export class sanctionedAddress extends Entity {
 
   set address(value: Bytes) {
     this.set("address", Value.fromBytes(value));
+  }
+
+  get transaction(): Bytes {
+    let value = this.get("transaction");
+    return value!.toBytes();
+  }
+
+  set transaction(value: Bytes) {
+    this.set("transaction", Value.fromBytes(value));
+  }
+
+  get timestamp(): BigInt {
+    let value = this.get("timestamp");
+    return value!.toBigInt();
+  }
+
+  set timestamp(value: BigInt) {
+    this.set("timestamp", Value.fromBigInt(value));
+  }
+
+  get blockNum(): BigInt {
+    let value = this.get("blockNum");
+    return value!.toBigInt();
+  }
+
+  set blockNum(value: BigInt) {
+    this.set("blockNum", Value.fromBigInt(value));
+  }
+}
+
+export class interestApplied extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("borrower", Value.fromBytes(Bytes.empty()));
+    this.set("totalInterest", Value.fromBigInt(BigInt.zero()));
+    this.set("transaction", Value.fromBytes(Bytes.empty()));
+    this.set("timestamp", Value.fromBigInt(BigInt.zero()));
+    this.set("blockNum", Value.fromBigInt(BigInt.zero()));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save interestApplied entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save interestApplied entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("interestApplied", id.toString(), this);
+    }
+  }
+
+  static load(id: string): interestApplied | null {
+    return changetype<interestApplied | null>(store.get("interestApplied", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get borrower(): Bytes {
+    let value = this.get("borrower");
+    return value!.toBytes();
+  }
+
+  set borrower(value: Bytes) {
+    this.set("borrower", Value.fromBytes(value));
+  }
+
+  get totalInterest(): BigInt {
+    let value = this.get("totalInterest");
+    return value!.toBigInt();
+  }
+
+  set totalInterest(value: BigInt) {
+    this.set("totalInterest", Value.fromBigInt(value));
   }
 
   get transaction(): Bytes {

@@ -67,7 +67,6 @@ export function handleTroveUpdated(event: TroveUpdated): void {
           trove.maxFeePercentage = t[8].toBigInt()
       }
     }
-
     if (trove.debt.gt(BigInt.zero())) {
       let contract = TroveManager.bind(Address.fromString("0x000000000000614c27530d24B5f039EC15A61d8d".toLowerCase()))
       trove.currentICR = contract.getCurrentICR(Address.fromBytes(event.params._borrower))
@@ -78,6 +77,7 @@ export function handleTroveUpdated(event: TroveUpdated): void {
     trove.valuesOut = getValues(trove.realAmountsOut, trove.collsOut)
     trove.totalValue = sumValues(trove.values)
     trove.valueChange = sumValues(trove.valuesIn).minus(sumValues(trove.valuesOut))
+    
     trove.save()
 }
 

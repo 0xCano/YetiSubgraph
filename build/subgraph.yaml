@@ -55,10 +55,10 @@ dataSources:
         - name: TroveManager
           file: TroveManager/abis/TroveManager.json
       eventHandlers:
-        - event: TroveUpdated(indexed address,uint256,address[],uint256[],uint8)
-          handler: handleTroveUpdated
         - event: TotalStakesUpdated(address,uint256)
           handler: handleTotalStakesUpdated
+        - event: InterestApplied(address,uint256)
+          handler: handleInterestApplied
       file: TroveManager/TroveManager.wasm
   - kind: ethereum/contract
     name: TroveManagerRedemptions

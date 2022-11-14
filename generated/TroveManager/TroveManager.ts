@@ -28,6 +28,28 @@ export class BaseRateUpdated__Params {
   }
 }
 
+export class InterestApplied extends ethereum.Event {
+  get params(): InterestApplied__Params {
+    return new InterestApplied__Params(this);
+  }
+}
+
+export class InterestApplied__Params {
+  _event: InterestApplied;
+
+  constructor(event: InterestApplied) {
+    this._event = event;
+  }
+
+  get _borrower(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get totalInterest(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
+  }
+}
+
 export class LTermsUpdated extends ethereum.Event {
   get params(): LTermsUpdated__Params {
     return new LTermsUpdated__Params(this);
@@ -72,6 +94,28 @@ export class LTermsUpdated1__Params {
   }
 
   get _L_YUSDDebt(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
+  }
+}
+
+export class L_YUSDInterestUpdated extends ethereum.Event {
+  get params(): L_YUSDInterestUpdated__Params {
+    return new L_YUSDInterestUpdated__Params(this);
+  }
+}
+
+export class L_YUSDInterestUpdated__Params {
+  _event: L_YUSDInterestUpdated;
+
+  constructor(event: L_YUSDInterestUpdated) {
+    this._event = event;
+  }
+
+  get token(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get new_Lterm(): BigInt {
     return this._event.parameters[1].value.toBigInt();
   }
 }
@@ -381,6 +425,7 @@ export class TroveManager__getEntireDebtAndCollsResult {
   value3: BigInt;
   value4: Array<Address>;
   value5: Array<BigInt>;
+  value6: BigInt;
 
   constructor(
     value0: BigInt,
@@ -388,7 +433,8 @@ export class TroveManager__getEntireDebtAndCollsResult {
     value2: Array<BigInt>,
     value3: BigInt,
     value4: Array<Address>,
-    value5: Array<BigInt>
+    value5: Array<BigInt>,
+    value6: BigInt
   ) {
     this.value0 = value0;
     this.value1 = value1;
@@ -396,6 +442,7 @@ export class TroveManager__getEntireDebtAndCollsResult {
     this.value3 = value3;
     this.value4 = value4;
     this.value5 = value5;
+    this.value6 = value6;
   }
 
   toMap(): TypedMap<string, ethereum.Value> {
@@ -406,6 +453,7 @@ export class TroveManager__getEntireDebtAndCollsResult {
     map.set("value3", ethereum.Value.fromUnsignedBigInt(this.value3));
     map.set("value4", ethereum.Value.fromAddressArray(this.value4));
     map.set("value5", ethereum.Value.fromUnsignedBigIntArray(this.value5));
+    map.set("value6", ethereum.Value.fromUnsignedBigInt(this.value6));
     return map;
   }
 }
@@ -423,6 +471,23 @@ export class TroveManager__getPendingCollRewardsResult {
     let map = new TypedMap<string, ethereum.Value>();
     map.set("value0", ethereum.Value.fromAddressArray(this.value0));
     map.set("value1", ethereum.Value.fromUnsignedBigIntArray(this.value1));
+    return map;
+  }
+}
+
+export class TroveManager__getPendingYUSDDebtRewardResult {
+  value0: BigInt;
+  value1: BigInt;
+
+  constructor(value0: BigInt, value1: BigInt) {
+    this.value0 = value0;
+    this.value1 = value1;
+  }
+
+  toMap(): TypedMap<string, ethereum.Value> {
+    let map = new TypedMap<string, ethereum.Value>();
+    map.set("value0", ethereum.Value.fromUnsignedBigInt(this.value0));
+    map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
     return map;
   }
 }
@@ -449,29 +514,6 @@ export class TroveManager extends ethereum.SmartContract {
     return new TroveManager("TroveManager", address);
   }
 
-  BOOTSTRAP_PERIOD(): BigInt {
-    let result = super.call(
-      "BOOTSTRAP_PERIOD",
-      "BOOTSTRAP_PERIOD():(uint256)",
-      []
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_BOOTSTRAP_PERIOD(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "BOOTSTRAP_PERIOD",
-      "BOOTSTRAP_PERIOD():(uint256)",
-      []
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
   DECIMAL_PRECISION(): BigInt {
     let result = super.call(
       "DECIMAL_PRECISION",
@@ -488,44 +530,6 @@ export class TroveManager extends ethereum.SmartContract {
       "DECIMAL_PRECISION():(uint256)",
       []
     );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  L_Coll(param0: Address): BigInt {
-    let result = super.call("L_Coll", "L_Coll(address):(uint256)", [
-      ethereum.Value.fromAddress(param0)
-    ]);
-
-    return result[0].toBigInt();
-  }
-
-  try_L_Coll(param0: Address): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("L_Coll", "L_Coll(address):(uint256)", [
-      ethereum.Value.fromAddress(param0)
-    ]);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  L_YUSDDebt(param0: Address): BigInt {
-    let result = super.call("L_YUSDDebt", "L_YUSDDebt(address):(uint256)", [
-      ethereum.Value.fromAddress(param0)
-    ]);
-
-    return result[0].toBigInt();
-  }
-
-  try_L_YUSDDebt(param0: Address): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("L_YUSDDebt", "L_YUSDDebt(address):(uint256)", [
-      ethereum.Value.fromAddress(param0)
-    ]);
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -579,40 +583,19 @@ export class TroveManager extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  NAME(): Bytes {
-    let result = super.call("NAME", "NAME():(bytes32)", []);
+  NAME(): string {
+    let result = super.call("NAME", "NAME():(string)", []);
 
-    return result[0].toBytes();
+    return result[0].toString();
   }
 
-  try_NAME(): ethereum.CallResult<Bytes> {
-    let result = super.tryCall("NAME", "NAME():(bytes32)", []);
+  try_NAME(): ethereum.CallResult<string> {
+    let result = super.tryCall("NAME", "NAME():(string)", []);
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBytes());
-  }
-
-  TroveOwners(param0: BigInt): Address {
-    let result = super.call("TroveOwners", "TroveOwners(uint256):(address)", [
-      ethereum.Value.fromUnsignedBigInt(param0)
-    ]);
-
-    return result[0].toAddress();
-  }
-
-  try_TroveOwners(param0: BigInt): ethereum.CallResult<Address> {
-    let result = super.tryCall(
-      "TroveOwners",
-      "TroveOwners(uint256):(address)",
-      [ethereum.Value.fromUnsignedBigInt(param0)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
+    return ethereum.CallResult.fromValue(value[0].toString());
   }
 
   addTroveOwnerToArray(_borrower: Address): BigInt {
@@ -676,6 +659,45 @@ export class TroveManager extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
+  changeTroveDebt(
+    _borrower: Address,
+    _debtChange: BigInt,
+    _isDebtIncrease: boolean
+  ): BigInt {
+    let result = super.call(
+      "changeTroveDebt",
+      "changeTroveDebt(address,uint256,bool):(uint256)",
+      [
+        ethereum.Value.fromAddress(_borrower),
+        ethereum.Value.fromUnsignedBigInt(_debtChange),
+        ethereum.Value.fromBoolean(_isDebtIncrease)
+      ]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_changeTroveDebt(
+    _borrower: Address,
+    _debtChange: BigInt,
+    _isDebtIncrease: boolean
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "changeTroveDebt",
+      "changeTroveDebt(address,uint256,bool):(uint256)",
+      [
+        ethereum.Value.fromAddress(_borrower),
+        ethereum.Value.fromUnsignedBigInt(_debtChange),
+        ethereum.Value.fromBoolean(_isDebtIncrease)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
   checkRecoveryMode(): boolean {
     let result = super.call(
       "checkRecoveryMode",
@@ -716,61 +738,6 @@ export class TroveManager extends ethereum.SmartContract {
       "decayBaseRateFromBorrowingAndCalculateFee",
       "decayBaseRateFromBorrowingAndCalculateFee(uint256):(uint256)",
       [ethereum.Value.fromUnsignedBigInt(_YUSDDebt)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  decreaseTroveDebt(_borrower: Address, _debtDecrease: BigInt): BigInt {
-    let result = super.call(
-      "decreaseTroveDebt",
-      "decreaseTroveDebt(address,uint256):(uint256)",
-      [
-        ethereum.Value.fromAddress(_borrower),
-        ethereum.Value.fromUnsignedBigInt(_debtDecrease)
-      ]
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_decreaseTroveDebt(
-    _borrower: Address,
-    _debtDecrease: BigInt
-  ): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "decreaseTroveDebt",
-      "decreaseTroveDebt(address,uint256):(uint256)",
-      [
-        ethereum.Value.fromAddress(_borrower),
-        ethereum.Value.fromUnsignedBigInt(_debtDecrease)
-      ]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  getBORROWING_FEE_FLOOR(): BigInt {
-    let result = super.call(
-      "getBORROWING_FEE_FLOOR",
-      "getBORROWING_FEE_FLOOR():(uint256)",
-      []
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_getBORROWING_FEE_FLOOR(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "getBORROWING_FEE_FLOOR",
-      "getBORROWING_FEE_FLOOR():(uint256)",
-      []
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -886,6 +853,66 @@ export class TroveManager extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
+  getCollateralProportionDenominator(_borrower: Address): BigInt {
+    let result = super.call(
+      "getCollateralProportionDenominator",
+      "getCollateralProportionDenominator(address):(uint256)",
+      [ethereum.Value.fromAddress(_borrower)]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_getCollateralProportionDenominator(
+    _borrower: Address
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "getCollateralProportionDenominator",
+      "getCollateralProportionDenominator(address):(uint256)",
+      [ethereum.Value.fromAddress(_borrower)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  getCollateralProportionNumerator(
+    _borrower: Address,
+    _collateral: Address
+  ): BigInt {
+    let result = super.call(
+      "getCollateralProportionNumerator",
+      "getCollateralProportionNumerator(address,address):(uint256)",
+      [
+        ethereum.Value.fromAddress(_borrower),
+        ethereum.Value.fromAddress(_collateral)
+      ]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_getCollateralProportionNumerator(
+    _borrower: Address,
+    _collateral: Address
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "getCollateralProportionNumerator",
+      "getCollateralProportionNumerator(address,address):(uint256)",
+      [
+        ethereum.Value.fromAddress(_borrower),
+        ethereum.Value.fromAddress(_collateral)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
   getCurrentAICR(_borrower: Address): BigInt {
     let result = super.call(
       "getCurrentAICR",
@@ -974,7 +1001,7 @@ export class TroveManager extends ethereum.SmartContract {
   ): TroveManager__getEntireDebtAndCollsResult {
     let result = super.call(
       "getEntireDebtAndColls",
-      "getEntireDebtAndColls(address):(uint256,address[],uint256[],uint256,address[],uint256[])",
+      "getEntireDebtAndColls(address):(uint256,address[],uint256[],uint256,address[],uint256[],uint256)",
       [ethereum.Value.fromAddress(_borrower)]
     );
 
@@ -984,7 +1011,8 @@ export class TroveManager extends ethereum.SmartContract {
       result[2].toBigIntArray(),
       result[3].toBigInt(),
       result[4].toAddressArray(),
-      result[5].toBigIntArray()
+      result[5].toBigIntArray(),
+      result[6].toBigInt()
     );
   }
 
@@ -993,7 +1021,7 @@ export class TroveManager extends ethereum.SmartContract {
   ): ethereum.CallResult<TroveManager__getEntireDebtAndCollsResult> {
     let result = super.tryCall(
       "getEntireDebtAndColls",
-      "getEntireDebtAndColls(address):(uint256,address[],uint256[],uint256,address[],uint256[])",
+      "getEntireDebtAndColls(address):(uint256,address[],uint256[],uint256,address[],uint256[],uint256)",
       [ethereum.Value.fromAddress(_borrower)]
     );
     if (result.reverted) {
@@ -1007,7 +1035,8 @@ export class TroveManager extends ethereum.SmartContract {
         value[2].toBigIntArray(),
         value[3].toBigInt(),
         value[4].toAddressArray(),
-        value[5].toBigIntArray()
+        value[5].toBigIntArray(),
+        value[6].toBigInt()
       )
     );
   }
@@ -1169,29 +1198,39 @@ export class TroveManager extends ethereum.SmartContract {
     );
   }
 
-  getPendingYUSDDebtReward(_borrower: Address): BigInt {
+  getPendingYUSDDebtReward(
+    _borrower: Address
+  ): TroveManager__getPendingYUSDDebtRewardResult {
     let result = super.call(
       "getPendingYUSDDebtReward",
-      "getPendingYUSDDebtReward(address):(uint256)",
+      "getPendingYUSDDebtReward(address):(uint256,uint256)",
       [ethereum.Value.fromAddress(_borrower)]
     );
 
-    return result[0].toBigInt();
+    return new TroveManager__getPendingYUSDDebtRewardResult(
+      result[0].toBigInt(),
+      result[1].toBigInt()
+    );
   }
 
   try_getPendingYUSDDebtReward(
     _borrower: Address
-  ): ethereum.CallResult<BigInt> {
+  ): ethereum.CallResult<TroveManager__getPendingYUSDDebtRewardResult> {
     let result = super.tryCall(
       "getPendingYUSDDebtReward",
-      "getPendingYUSDDebtReward(address):(uint256)",
+      "getPendingYUSDDebtReward(address):(uint256,uint256)",
       [ethereum.Value.fromAddress(_borrower)]
     );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
+    return ethereum.CallResult.fromValue(
+      new TroveManager__getPendingYUSDDebtRewardResult(
+        value[0].toBigInt(),
+        value[1].toBigInt()
+      )
+    );
   }
 
   getREDEMPTION_FEE_FLOOR(): BigInt {
@@ -1612,30 +1651,21 @@ export class TroveManager extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
-  increaseTroveDebt(_borrower: Address, _debtIncrease: BigInt): BigInt {
+  interestTimeWindow(): BigInt {
     let result = super.call(
-      "increaseTroveDebt",
-      "increaseTroveDebt(address,uint256):(uint256)",
-      [
-        ethereum.Value.fromAddress(_borrower),
-        ethereum.Value.fromUnsignedBigInt(_debtIncrease)
-      ]
+      "interestTimeWindow",
+      "interestTimeWindow():(uint256)",
+      []
     );
 
     return result[0].toBigInt();
   }
 
-  try_increaseTroveDebt(
-    _borrower: Address,
-    _debtIncrease: BigInt
-  ): ethereum.CallResult<BigInt> {
+  try_interestTimeWindow(): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
-      "increaseTroveDebt",
-      "increaseTroveDebt(address,uint256):(uint256)",
-      [
-        ethereum.Value.fromAddress(_borrower),
-        ethereum.Value.fromUnsignedBigInt(_debtIncrease)
-      ]
+      "interestTimeWindow",
+      "interestTimeWindow():(uint256)",
+      []
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -1713,6 +1743,29 @@ export class TroveManager extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
+  lastInterestRateUpdateTime(): BigInt {
+    let result = super.call(
+      "lastInterestRateUpdateTime",
+      "lastInterestRateUpdateTime():(uint256)",
+      []
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_lastInterestRateUpdateTime(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "lastInterestRateUpdateTime",
+      "lastInterestRateUpdateTime():(uint256)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
   lastYUSDDebtError_Redistribution(param0: Address): BigInt {
     let result = super.call(
       "lastYUSDDebtError_Redistribution",
@@ -1752,27 +1805,6 @@ export class TroveManager extends ethereum.SmartContract {
     let result = super.tryCall(
       "totalCollateralSnapshot",
       "totalCollateralSnapshot(address):(uint256)",
-      [ethereum.Value.fromAddress(param0)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  totalStakes(param0: Address): BigInt {
-    let result = super.call("totalStakes", "totalStakes(address):(uint256)", [
-      ethereum.Value.fromAddress(param0)
-    ]);
-
-    return result[0].toBigInt();
-  }
-
-  try_totalStakes(param0: Address): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "totalStakes",
-      "totalStakes(address):(uint256)",
       [ethereum.Value.fromAddress(param0)]
     );
     if (result.reverted) {
@@ -1904,63 +1936,75 @@ export class BatchLiquidateTrovesCall__Outputs {
   }
 }
 
-export class CloseTroveLiquidationCall extends ethereum.Call {
-  get inputs(): CloseTroveLiquidationCall__Inputs {
-    return new CloseTroveLiquidationCall__Inputs(this);
+export class ChangeInterestTimeWindowCall extends ethereum.Call {
+  get inputs(): ChangeInterestTimeWindowCall__Inputs {
+    return new ChangeInterestTimeWindowCall__Inputs(this);
   }
 
-  get outputs(): CloseTroveLiquidationCall__Outputs {
-    return new CloseTroveLiquidationCall__Outputs(this);
+  get outputs(): ChangeInterestTimeWindowCall__Outputs {
+    return new ChangeInterestTimeWindowCall__Outputs(this);
   }
 }
 
-export class CloseTroveLiquidationCall__Inputs {
-  _call: CloseTroveLiquidationCall;
+export class ChangeInterestTimeWindowCall__Inputs {
+  _call: ChangeInterestTimeWindowCall;
 
-  constructor(call: CloseTroveLiquidationCall) {
+  constructor(call: ChangeInterestTimeWindowCall) {
+    this._call = call;
+  }
+
+  get _newInterestTimeWindow(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class ChangeInterestTimeWindowCall__Outputs {
+  _call: ChangeInterestTimeWindowCall;
+
+  constructor(call: ChangeInterestTimeWindowCall) {
+    this._call = call;
+  }
+}
+
+export class ChangeTroveDebtCall extends ethereum.Call {
+  get inputs(): ChangeTroveDebtCall__Inputs {
+    return new ChangeTroveDebtCall__Inputs(this);
+  }
+
+  get outputs(): ChangeTroveDebtCall__Outputs {
+    return new ChangeTroveDebtCall__Outputs(this);
+  }
+}
+
+export class ChangeTroveDebtCall__Inputs {
+  _call: ChangeTroveDebtCall;
+
+  constructor(call: ChangeTroveDebtCall) {
     this._call = call;
   }
 
   get _borrower(): Address {
     return this._call.inputValues[0].value.toAddress();
   }
-}
 
-export class CloseTroveLiquidationCall__Outputs {
-  _call: CloseTroveLiquidationCall;
+  get _debtChange(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
 
-  constructor(call: CloseTroveLiquidationCall) {
-    this._call = call;
+  get _isDebtIncrease(): boolean {
+    return this._call.inputValues[2].value.toBoolean();
   }
 }
 
-export class CloseTroveRedemptionCall extends ethereum.Call {
-  get inputs(): CloseTroveRedemptionCall__Inputs {
-    return new CloseTroveRedemptionCall__Inputs(this);
-  }
+export class ChangeTroveDebtCall__Outputs {
+  _call: ChangeTroveDebtCall;
 
-  get outputs(): CloseTroveRedemptionCall__Outputs {
-    return new CloseTroveRedemptionCall__Outputs(this);
-  }
-}
-
-export class CloseTroveRedemptionCall__Inputs {
-  _call: CloseTroveRedemptionCall;
-
-  constructor(call: CloseTroveRedemptionCall) {
+  constructor(call: ChangeTroveDebtCall) {
     this._call = call;
   }
 
-  get _borrower(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-}
-
-export class CloseTroveRedemptionCall__Outputs {
-  _call: CloseTroveRedemptionCall;
-
-  constructor(call: CloseTroveRedemptionCall) {
-    this._call = call;
+  get newDebt(): BigInt {
+    return this._call.outputValues[0].value.toBigInt();
   }
 }
 
@@ -1998,79 +2042,33 @@ export class DecayBaseRateFromBorrowingAndCalculateFeeCall__Outputs {
   }
 }
 
-export class DecreaseTroveDebtCall extends ethereum.Call {
-  get inputs(): DecreaseTroveDebtCall__Inputs {
-    return new DecreaseTroveDebtCall__Inputs(this);
+export class InterestInitCollateralCall extends ethereum.Call {
+  get inputs(): InterestInitCollateralCall__Inputs {
+    return new InterestInitCollateralCall__Inputs(this);
   }
 
-  get outputs(): DecreaseTroveDebtCall__Outputs {
-    return new DecreaseTroveDebtCall__Outputs(this);
+  get outputs(): InterestInitCollateralCall__Outputs {
+    return new InterestInitCollateralCall__Outputs(this);
   }
 }
 
-export class DecreaseTroveDebtCall__Inputs {
-  _call: DecreaseTroveDebtCall;
+export class InterestInitCollateralCall__Inputs {
+  _call: InterestInitCollateralCall;
 
-  constructor(call: DecreaseTroveDebtCall) {
+  constructor(call: InterestInitCollateralCall) {
     this._call = call;
   }
 
-  get _borrower(): Address {
+  get _newCollateral(): Address {
     return this._call.inputValues[0].value.toAddress();
   }
-
-  get _debtDecrease(): BigInt {
-    return this._call.inputValues[1].value.toBigInt();
-  }
 }
 
-export class DecreaseTroveDebtCall__Outputs {
-  _call: DecreaseTroveDebtCall;
+export class InterestInitCollateralCall__Outputs {
+  _call: InterestInitCollateralCall;
 
-  constructor(call: DecreaseTroveDebtCall) {
+  constructor(call: InterestInitCollateralCall) {
     this._call = call;
-  }
-
-  get value0(): BigInt {
-    return this._call.outputValues[0].value.toBigInt();
-  }
-}
-
-export class IncreaseTroveDebtCall extends ethereum.Call {
-  get inputs(): IncreaseTroveDebtCall__Inputs {
-    return new IncreaseTroveDebtCall__Inputs(this);
-  }
-
-  get outputs(): IncreaseTroveDebtCall__Outputs {
-    return new IncreaseTroveDebtCall__Outputs(this);
-  }
-}
-
-export class IncreaseTroveDebtCall__Inputs {
-  _call: IncreaseTroveDebtCall;
-
-  constructor(call: IncreaseTroveDebtCall) {
-    this._call = call;
-  }
-
-  get _borrower(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-
-  get _debtIncrease(): BigInt {
-    return this._call.inputValues[1].value.toBigInt();
-  }
-}
-
-export class IncreaseTroveDebtCall__Outputs {
-  _call: IncreaseTroveDebtCall;
-
-  constructor(call: IncreaseTroveDebtCall) {
-    this._call = call;
-  }
-
-  get value0(): BigInt {
-    return this._call.outputValues[0].value.toBigInt();
   }
 }
 
@@ -2258,36 +2256,6 @@ export class RedistributeDebtAndCollCall__Outputs {
   }
 }
 
-export class RemoveStakeCall extends ethereum.Call {
-  get inputs(): RemoveStakeCall__Inputs {
-    return new RemoveStakeCall__Inputs(this);
-  }
-
-  get outputs(): RemoveStakeCall__Outputs {
-    return new RemoveStakeCall__Outputs(this);
-  }
-}
-
-export class RemoveStakeCall__Inputs {
-  _call: RemoveStakeCall;
-
-  constructor(call: RemoveStakeCall) {
-    this._call = call;
-  }
-
-  get _borrower(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-}
-
-export class RemoveStakeCall__Outputs {
-  _call: RemoveStakeCall;
-
-  constructor(call: RemoveStakeCall) {
-    this._call = call;
-  }
-}
-
 export class RemoveStakeAndCloseTroveCall extends ethereum.Call {
   get inputs(): RemoveStakeAndCloseTroveCall__Inputs {
     return new RemoveStakeAndCloseTroveCall__Inputs(this);
@@ -2308,66 +2276,16 @@ export class RemoveStakeAndCloseTroveCall__Inputs {
   get _borrower(): Address {
     return this._call.inputValues[0].value.toAddress();
   }
+
+  get _status(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
 }
 
 export class RemoveStakeAndCloseTroveCall__Outputs {
   _call: RemoveStakeAndCloseTroveCall;
 
   constructor(call: RemoveStakeAndCloseTroveCall) {
-    this._call = call;
-  }
-}
-
-export class SetAddressesCall extends ethereum.Call {
-  get inputs(): SetAddressesCall__Inputs {
-    return new SetAddressesCall__Inputs(this);
-  }
-
-  get outputs(): SetAddressesCall__Outputs {
-    return new SetAddressesCall__Outputs(this);
-  }
-}
-
-export class SetAddressesCall__Inputs {
-  _call: SetAddressesCall;
-
-  constructor(call: SetAddressesCall) {
-    this._call = call;
-  }
-
-  get _borrowerOperationsAddress(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-
-  get _activePoolAddress(): Address {
-    return this._call.inputValues[1].value.toAddress();
-  }
-
-  get _defaultPoolAddress(): Address {
-    return this._call.inputValues[2].value.toAddress();
-  }
-
-  get _sortedTrovesAddress(): Address {
-    return this._call.inputValues[3].value.toAddress();
-  }
-
-  get _controllerAddress(): Address {
-    return this._call.inputValues[4].value.toAddress();
-  }
-
-  get _troveManagerRedemptionsAddress(): Address {
-    return this._call.inputValues[5].value.toAddress();
-  }
-
-  get _troveManagerLiquidationsAddress(): Address {
-    return this._call.inputValues[6].value.toAddress();
-  }
-}
-
-export class SetAddressesCall__Outputs {
-  _call: SetAddressesCall;
-
-  constructor(call: SetAddressesCall) {
     this._call = call;
   }
 }
@@ -2402,6 +2320,32 @@ export class SetTroveStatusCall__Outputs {
   _call: SetTroveStatusCall;
 
   constructor(call: SetTroveStatusCall) {
+    this._call = call;
+  }
+}
+
+export class TickInterestCall extends ethereum.Call {
+  get inputs(): TickInterestCall__Inputs {
+    return new TickInterestCall__Inputs(this);
+  }
+
+  get outputs(): TickInterestCall__Outputs {
+    return new TickInterestCall__Outputs(this);
+  }
+}
+
+export class TickInterestCall__Inputs {
+  _call: TickInterestCall;
+
+  constructor(call: TickInterestCall) {
+    this._call = call;
+  }
+}
+
+export class TickInterestCall__Outputs {
+  _call: TickInterestCall;
+
+  constructor(call: TickInterestCall) {
     this._call = call;
   }
 }

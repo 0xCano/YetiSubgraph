@@ -37,6 +37,7 @@ type updatedTrove @entity {
   valueChange: BigDecimal!
   totalValue: BigDecimal!
   currentICR: BigInt!
+  interest: BigInt!
 
   maxSlippages: [BigInt!]!
   upperHint: Bytes!
@@ -160,6 +161,15 @@ type global @entity {
 type sanctionedAddress @entity {
   id: ID!
   address: Bytes!
+  transaction: Bytes!
+  timestamp: BigInt!
+  blockNum: BigInt!
+}
+
+type interestApplied @entity {
+  id: ID!
+  borrower: Bytes!
+  totalInterest: BigInt!
   transaction: Bytes!
   timestamp: BigInt!
   blockNum: BigInt!
