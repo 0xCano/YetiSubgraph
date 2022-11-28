@@ -7,6 +7,7 @@ import { getRealAmounts, getValues, getTxnInputDataToDecode, sumValues, updateTr
 
 var BorrowerOperation = ["openTrove", "closeTrove", "adjustTrove"]
 
+// Mapping of TroveUpdated events. Calculations and conversions are done with functions on utils.ts.
 export function handleTroveUpdated(event: TroveUpdated): void {
   let id = event.transaction.hash.toHex()
   let trove = updatedTrove.load(id)
@@ -23,7 +24,8 @@ export function handleTroveUpdated(event: TroveUpdated): void {
     trove.operation = BorrowerOperation[event.params.operation]
     trove.transaction = event.transaction.hash
     trove.blockNum = event.block.number
-      
+    
+    // Decode raw input bits to input list.
     const dataToDecode = getTxnInputDataToDecode(event)
 
     let operation = trove.operation
@@ -76,12 +78,12 @@ export function handleTroveUpdated(event: TroveUpdated): void {
     trove.realAmountsOut = getRealAmounts(trove.amountsOut, trove.collsOut)
     trove.valuesOut = getValues(trove.realAmountsOut, trove.collsOut)
     trove.totalValue = sumValues(trove.values)
-    trove.valueChange = sumValues(trove.valuesIn).minus(sumValues(trove.valuesOut))
-    
+    trove.valueChange = sumValues(trove.valuesIn).minus(sumValues(trove.valuesOut))  
     trove.save()
 }
 
 
+// Mapping of YUSDBorrowingFeePaid Event.
 export function handleYUSDPaid(event: YUSDBorrowingFeePaid): void {
   let id = event.transaction.hash.toHex()
   let yusdPaid =  new YUSDPaid(id)
@@ -101,6 +103,7 @@ export function handleYUSDPaid(event: YUSDBorrowingFeePaid): void {
   yusdPaid.save()
 }
 
+// Mapping of VariableFeePaid Event.
 export function handleVariablePaid(event: VariableFeePaid): void {
   let id = event.transaction.hash.toHex()
   let variablePaid =  new VariablePaid(id)

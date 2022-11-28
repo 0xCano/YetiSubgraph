@@ -1,6 +1,8 @@
 import { TroveUpdated, TroveManager, TotalStakesUpdated, InterestApplied} from '../generated/TroveManager/TroveManager'
 import {updatedTrove, totalStake, interestApplied} from '../generated/schema'
 
+
+// Mapping of TotalStakesUpdated Event.
 export function handleTotalStakesUpdated(event: TotalStakesUpdated): void {
   let id = event.transaction.hash.toHex()
   let TotalStakes = new totalStake(id)
@@ -9,6 +11,7 @@ export function handleTotalStakesUpdated(event: TotalStakesUpdated): void {
   TotalStakes.save()
 }
 
+// Mapping of InterestApplied Event.
 export function handleInterestApplied(event: InterestApplied): void {
   let id = event.transaction.hash.toHex()
   let interest =  new interestApplied(id)

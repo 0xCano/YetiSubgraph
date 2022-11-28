@@ -1,6 +1,7 @@
-import {BoostedFarm, Deposit, Withdraw, EmergencyWithdraw} from "../generated/BoostedFarm/BoostedFarm"
+import { BoostedFarm, Deposit, EmergencyWithdraw, Withdraw } from "../generated/BoostedFarm/BoostedFarm"
 import { farmOperation } from "../generated/schema"
 
+// Mapping of boosted farm Deposit event.
 export function handleDeposit(event: Deposit): void {
     let id = event.transaction.hash.toHex()
     let deposit = farmOperation.load(id)
@@ -21,7 +22,7 @@ export function handleDeposit(event: Deposit): void {
     deposit.save()
 }
 
-
+// Mapping of boosted farm Withdraw event.
 export function handleWithdraw(event: Withdraw): void {
     let id = event.transaction.hash.toHex()
     let deposit = farmOperation.load(id)
@@ -42,7 +43,8 @@ export function handleWithdraw(event: Withdraw): void {
     deposit.save()
 }
 
-export function handleEmergencyWithdraw(event: Withdraw): void {
+// Mapping of boosted farm EmergencyWithdraw event.
+export function handleEmergencyWithdraw(event: EmergencyWithdraw): void {
     let id = event.transaction.hash.toHex()
     let deposit = farmOperation.load(id)
     if (deposit == null) {

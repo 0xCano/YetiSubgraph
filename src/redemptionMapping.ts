@@ -5,6 +5,7 @@ import { TroveUpdated } from "../generated/TroveManager/TroveManager"
 import { Address, BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts"
 import { getValues, getRealAmounts, sumValues, updateTroveStatus} from "./utils"
 
+// Mapping of Redemption Event.
 export function handleRedemption(event: Redemption): void {
   let id = event.transaction.hash.toHex()
   let redemption = newRedemption.load(id)
@@ -22,7 +23,7 @@ export function handleRedemption(event: Redemption): void {
   redemption.save()
 }
 
-
+// Mapping of TroveUpdated Event from Redemption.
 export function handleTroveUpdated(event: TroveUpdated): void {
   let id = event.transaction.hash.toHex().concat(event.params._borrower.toHex())
   let troveUpdate = updatedTrove.load(id)

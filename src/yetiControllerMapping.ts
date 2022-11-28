@@ -1,13 +1,10 @@
 import {CollateralAdded, CollateralDeprecated, CollateralUndeprecated, DeprecateAllCollateralCall, DeprecateCollateralCall} from '../generated/YetiController/YetiController'
 import {collateral} from '../generated/schema'
 import { Address, ethereum, Bytes, ByteArray, bigInt, BigInt} from '@graphprotocol/graph-ts'
+import { getTxnInputDataToDecode } from './utils'
 
-export function getTxnInputDataToDecode(event: ethereum.Event): Bytes {
-    const inputDataHexString = event.transaction.input.toHexString().slice(10); //take away function signature: '0x????????'
-    // const hexStringToDecode = '0x0000000000000000000000000000000000000000000000000000000000000020' + inputDataHexString; // prepend tuple offset
-    return Bytes.fromByteArray(Bytes.fromHexString(inputDataHexString));
-  }
 
+// Mapping of CollateralAdded Event.
 export function handleCollateralAdded(event: CollateralAdded): void {
     let id = event.params._collateral.toHex()
     let col = new collateral(id)
@@ -38,6 +35,8 @@ export function handleCollateralAdded(event: CollateralAdded): void {
     col.save()
 }
 
+
+// Mapping of CollateralDeprecated Event.
 export function handleCollateralDeprecated(event: CollateralDeprecated): void {
     let id = event.params._collateral.toHex()
     let col = collateral.load(id)
@@ -51,6 +50,8 @@ export function handleCollateralDeprecated(event: CollateralDeprecated): void {
     }
 }
 
+
+// Mapping of CollateralUndeprecated Event.
 export function handleCollateralUndeprecated(event: CollateralUndeprecated): void {
     let id = event.params._collateral.toHex()
     let col = collateral.load(id)
