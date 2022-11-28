@@ -84,6 +84,6 @@ query {
       }
 ```
 
-it effectively provides all nodes that store historical transaction data made by the given user. Each eventhandling contributes
+it effectively provides all nodes that store historical transaction data made by the given user. Each eventhandling contributes to adding a `updatedTrove` node with the right data, reflecting the user opening, adjusting, and closing the trove as well as various types of redemptions and liquidations.
 
 
