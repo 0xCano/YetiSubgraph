@@ -55,7 +55,7 @@ After adding ABI of a contract, including it in the manifest and running `yarn c
 
 1. Make sure the authentications are correct (contact Yeti Finance for more details). 
 2. Run `yarn codegen`.
-3. Run graph deploy --product hosted-service 0xcano/yeti
+3. Run `graph deploy --product hosted-service 0xcano/yeti`
 
 ## Querying the Subgraph
 
